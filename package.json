@@ -1,0 +1,9 @@
+{
+  "name": "@swsnr/gse",
+  "version": "1.0.0",
+  "description": "Gnome shell extension tool",
+  "homepage": "https://github.com/swsnr/gse",
+  "keywords": ["gnome", "shell", "extension", "typescript"],
+  "author": "Sebastian Wiesner <sebastian@swsnr.de>",
+  "license": "(MIT OR Apache-2.0)"
+}
