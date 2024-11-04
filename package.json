@@ -1,9 +1,15 @@
 {
-  "name": "@swsnr/gse",
+  "name": "@swsnr/gsebuild",
   "version": "1.0.0",
   "description": "Gnome shell extension tool",
   "homepage": "https://github.com/swsnr/gse",
   "keywords": ["gnome", "shell", "extension", "typescript"],
   "author": "Sebastian Wiesner <sebastian@swsnr.de>",
-  "license": "(MIT OR Apache-2.0)"
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@tsconfig/strictest": "^2.0.5"
+  },
+  "exports": {
+    "./tsconfig.json": "./tsconfig/tsconfig.json"
+  }
 }
