@@ -2,14 +2,39 @@
   "name": "@swsnr/gsebuild",
   "version": "1.0.0",
   "description": "Gnome shell extension tool",
+  "type": "module",
   "homepage": "https://github.com/swsnr/gse",
-  "keywords": ["gnome", "shell", "extension", "typescript"],
+  "keywords": [
+    "gnome",
+    "shell",
+    "extension",
+    "typescript"
+  ],
   "author": "Sebastian Wiesner <sebastian@swsnr.de>",
   "license": "Apache-2.0",
   "dependencies": {
-    "@tsconfig/strictest": "^2.0.5"
+    "@eslint/js": "^9.14.0",
+    "@tsconfig/strictest": "^2.0.5",
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^9.14.0",
+    "eslint-plugin-promise": "^7.1.0",
+    "typescript-eslint": "^8.13.0"
+  },
+  "scripts": {
+    "prepare": "tsc --build tsconfig.json"
   },
   "exports": {
-    "./tsconfig.json": "./tsconfig/tsconfig.json"
+    "./tsconfig.json": "./tsconfig/tsconfig.json",
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./eslint": {
+      "default": "./dist/eslint/index.js",
+      "types": "./dist/eslint/index.d.ts"
+    }
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
   }
 }
