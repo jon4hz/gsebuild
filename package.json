@@ -3,7 +3,11 @@
   "version": "0.0.2",
   "description": "Build tooling for Gnome shell extensions",
   "type": "module",
-  "homepage": "https://github.com/swsnr/gse",
+  "homepage": "https://github.com/swsnr/gsebuild#readme",
+  "bugs": {
+    "url": "https://github.com/swsnr/gsebuild/issues"
+  },
+  "repository": "swsnr/gsebuild",
   "keywords": [
     "gnome",
     "shell",
