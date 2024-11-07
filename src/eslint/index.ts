@@ -19,6 +19,8 @@ import type { TSESLint } from "@typescript-eslint/utils";
 
 import guide from "./guide.js";
 
+export { default as dist } from "./dist.js";
+
 export const config: TSESLint.FlatConfig.ConfigArray = [
   eslint.configs.recommended,
   guide,
