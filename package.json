@@ -24,7 +24,8 @@
     "typescript-eslint": "^8.13.0"
   },
   "scripts": {
-    "prepare": "tsc --build tsconfig.json"
+    "prepare": "tsc --build tsconfig.json",
+    "format": "prettier ."
   },
   "exports": {
     "./tsconfig.json": "./tsconfig/tsconfig.json",
@@ -38,6 +39,7 @@
     }
   },
   "devDependencies": {
+    "prettier": "^3.3.3",
     "typescript": "^5.6.3"
   }
 }
