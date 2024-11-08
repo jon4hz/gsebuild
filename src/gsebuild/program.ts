@@ -38,7 +38,7 @@ const program = (): Command => {
     .action(async () => {
       const config = (
         JSON.parse(
-          await fs.readFile("./package.json", { encoding: "utf-8" })
+          await fs.readFile("./package.json", { encoding: "utf-8" }),
         ) as PackageJson
       ).gsebuild;
       await pack(config);

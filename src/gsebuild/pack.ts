@@ -24,7 +24,7 @@ import { Configuration, PatternToCopy } from "./config.js";
 type SourceAndDest = readonly [string, string];
 
 const getFilesToCopy = (
-  copyToSource: readonly Readonly<PatternToCopy>[]
+  copyToSource: readonly Readonly<PatternToCopy>[],
 ): Promise<readonly SourceAndDest[]> =>
   Promise.all(
     copyToSource.map(
@@ -34,14 +34,14 @@ const getFilesToCopy = (
         } else {
           return Promise.resolve([pattern]);
         }
-      }
-    )
+      },
+    ),
   ).then((files) =>
     files.flatMap((sources) =>
       sources.map((source) =>
-        typeof source === "string" ? [source, source] : source
-      )
-    )
+        typeof source === "string" ? [source, source] : source,
+      ),
+    ),
   );
 
 const copy =
@@ -81,13 +81,13 @@ const pack = async (config?: Configuration) => {
     sourceDirectory,
   ].concat(
     await Promise.all(
-      extraSources.map((source) => glob(source, { cwd: sourceDirectory }))
+      extraSources.map((source) => glob(source, { cwd: sourceDirectory })),
     ).then((sources) =>
-      sources.flat().map((source) => `--extra-source=${source}`)
+      sources.flat().map((source) => `--extra-source=${source}`),
     ),
     await Promise.all(
-      schemas.map((schema) => glob(schema, { cwd: sourceDirectory }))
-    ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`))
+      schemas.map((schema) => glob(schema, { cwd: sourceDirectory })),
+    ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`)),
   );
   if (poDirectory) {
     args.push(`--podir=${poDirectory}`);
