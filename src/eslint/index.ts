@@ -21,22 +21,42 @@ import guide from "./guide.js";
 
 export { default as dist } from "./dist.js";
 
-export const config: TSESLint.FlatConfig.ConfigArray = [
-  eslint.configs.recommended,
-  guide,
-  {
-    linterOptions: {
-      reportUnusedDisableDirectives: "error",
-    },
-    rules: {
-      // .eslintrc.gjs-guide.yml enables this, but it has no use in typescript
-      // which ensures a consistent return value through its type checks.
-      "consistent-return": "off",
-    },
-  },
-  ...tseslint.configs.strictTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
-  pluginPromise.configs["flat/recommended"],
-];
+export interface Configurations {
+  readonly javascript: TSESLint.FlatConfig.ConfigArray;
+  readonly typescript: TSESLint.FlatConfig.ConfigArray;
+}
 
-export default config;
+/**
+ * Configurations provided by gsebuild, for plain Javascript as well as for typescript.
+ */
+export const configs: Configurations = {
+  javascript: [
+    eslint.configs.recommended,
+    guide,
+    {
+      linterOptions: {
+        reportUnusedDisableDirectives: "error",
+      },
+    },
+    pluginPromise.configs["flat/recommended"],
+  ],
+  typescript: [
+    eslint.configs.recommended,
+    guide,
+    {
+      linterOptions: {
+        reportUnusedDisableDirectives: "error",
+      },
+      rules: {
+        // .eslintrc.gjs-guide.yml enables this, but it has no use in typescript
+        // which ensures a consistent return value through its type checks.
+        "consistent-return": "off",
+      },
+    },
+    ...tseslint.configs.strictTypeChecked,
+    ...tseslint.configs.stylisticTypeChecked,
+    pluginPromise.configs["flat/recommended"],
+  ],
+};
+
+export default { configs };
