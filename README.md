@@ -112,6 +112,8 @@ Additional files and directories can be included via `package.json`:
 With this configuration `npm run pack` includes `extension.js`, `prefs.js`, `metadata.json`, the `README.md`, and all LICENSE files.
 The packed extension ZIP for upload to extensions.gnome.org gets written to the `dist/` directory.
 
+Note that `gsebuild pack` uses the `gnome-extensions pack` command under the hood, and thus requires `gnome-shell` to be installed.
+
 ### Packaging complex extensions
 
 `gsebuild` also handles more complex extensions (see above for the Typescript setup):
