@@ -18,8 +18,7 @@ import pluginPromise from "eslint-plugin-promise";
 import type { TSESLint } from "@typescript-eslint/utils";
 
 import guide from "./guide.js";
-
-export { default as dist } from "./dist.js";
+import dist from "./dist.js";
 
 export interface Configurations {
   /**
@@ -28,14 +27,33 @@ export interface Configurations {
    * See https://gjs.guide/guides/gjs/style-guide.html#eslint
    */
   readonly guide: TSESLint.FlatConfig.Config;
+
   /**
    * The recommended configuration for plain Javascript.
    */
   readonly javascript: TSESLint.FlatConfig.ConfigArray;
+
   /**
    * The recommended configuration for Typescript.
    */
   readonly typescript: TSESLint.FlatConfig.ConfigArray;
+
+  /**
+   * A configuration to reformat Javascript files for distribution.
+   *
+   * This configuration reformats generated Javascript files to make them easier
+   * to read.  GNOME Shell extensions submitted to extensions.gnome.org are
+   * subject to manual review; hence the submitted artifacts must contain
+   * readable code.
+   *
+   * While tsc generally generates readable code, it trims whitespace and blank
+   * lines, and this eslint configuration aims to address this by adding some
+   * extra whitespace and blank lines again.
+   *
+   * Use this configuration with eslint --fix to reformat Typescript output
+   * before submission to extensions.gnome.org.
+   */
+  readonly dist: TSESLint.FlatConfig.Config;
 }
 
 /**
@@ -70,6 +88,7 @@ export const configs: Configurations = {
     ...tseslint.configs.stylisticTypeChecked,
     pluginPromise.configs["flat/recommended"],
   ],
+  dist,
 };
 
 export default { configs };
