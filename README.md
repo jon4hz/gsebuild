@@ -46,10 +46,10 @@ Then create a `tsconfig.json`:
 And a eslint configuration file `eslint.config.dist.js` to reformat typescript for submission to extensions.gnome.org:
 
 ```javascript
-import { dist } from "@swsnr/gsebuild/eslint";
+import eslint from "@swsnr/gsebuild/eslint";
 
 export default [
-  dist,
+  eslint.config.dist,
   {
     files: ["build/**/*"],
   },
