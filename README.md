@@ -26,6 +26,27 @@ $ npm install --save-dev @swsnr/gsebuild
 
 ## Setup
 
+### Eslint
+
+`gsebuild` ships with a recommended eslint configuration for Javascript (see below for Typescript).
+Setup `eslint.config.js` as follows:
+
+```javascript
+import gsebuild from "@swsnr/gsebuild/eslint";
+
+export default [
+  ...gsebuild.configs.javascript,
+  {
+    ignores: [
+      // Packages
+      "node_modules/**",
+    ],
+  },
+];
+```
+
+Then lint with `eslint .`.
+
 ### Typescript
 
 ```console
@@ -68,6 +89,38 @@ Then add `package.json` scripts to build Typescript:
   }
 }
 ```
+
+For linting with `eslint`, use the recommended typescript configuration from
+`gsebuild` in `eslint.confg.js`, and set up [typed linting](https://typescript-eslint.io/getting-started/typed-linting):
+
+```javascript
+import gsebuild from "@swsnr/gsebuild/eslint";
+
+export default [
+  ...gsebuild.configs.typescript,
+  {
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    ignores: [
+      // eslint configs
+      "eslint.config.*",
+      // Build outputs
+      "build/**/*",
+      "dist/**/*",
+      // Packages
+      "node_modules/**",
+    ],
+  },
+];
+```
+
+`gsebuild` already includes typescript-eslint.
 
 ### Blueprint
 
