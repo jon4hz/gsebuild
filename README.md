@@ -1,5 +1,8 @@
 # gsebuild
 
+![NPM Version](https://img.shields.io/npm/v/%40swsnr%2Fgsebuild)
+![CI status](https://img.shields.io/github/actions/workflow/status/swsnr/gsebuild/ci.yaml)
+
 Some kind of a build tool for GNOME extensions.
 
 This tool adds some scaffolding for building GNOME Shell extensions, especially with Typescript:
