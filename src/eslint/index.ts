@@ -22,7 +22,19 @@ import guide from "./guide.js";
 export { default as dist } from "./dist.js";
 
 export interface Configurations {
+  /**
+   * The bare configuration provided by the GJS Guide.
+   *
+   * See https://gjs.guide/guides/gjs/style-guide.html#eslint
+   */
+  readonly guide: TSESLint.FlatConfig.Config;
+  /**
+   * The recommended configuration for plain Javascript.
+   */
   readonly javascript: TSESLint.FlatConfig.ConfigArray;
+  /**
+   * The recommended configuration for Typescript.
+   */
   readonly typescript: TSESLint.FlatConfig.ConfigArray;
 }
 
@@ -30,6 +42,7 @@ export interface Configurations {
  * Configurations provided by gsebuild, for plain Javascript as well as for typescript.
  */
 export const configs: Configurations = {
+  guide,
   javascript: [
     eslint.configs.recommended,
     guide,
