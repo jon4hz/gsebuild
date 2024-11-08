@@ -38,7 +38,7 @@ export default tseslint.config(
   {
     ignores: [
       // Ignore eslint config, because these aren't included in the tsconfig which confuses eslint
-      "/eslint.config.js",
+      "eslint.config.js",
       "dist/**/*",
       "node_modules/**",
     ],
