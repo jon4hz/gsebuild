@@ -10,10 +10,11 @@ This tool adds some scaffolding for building GNOME Shell extensions, especially
 with Typescript:
 
 - Provide recommended eslint and tsc configurations.
+- Provide a `gsebuild` tool with helpful commands for managing extensions:
+  - `gsebuild pack` packs an extension ZIP for submission to extensions.gnome.org.
 
 Planned features:
 
-- Pack extensions from a conventional layout.
 - Extract messages from sources and UI/BLP files with xgettext.
 - Submit to extensions.gnome.org
 
