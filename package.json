@@ -1,6 +1,6 @@
 {
   "name": "@swsnr/gsebuild",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Build tooling for Gnome shell extensions",
   "type": "module",
   "homepage": "https://github.com/swsnr/gsebuild#readme",
