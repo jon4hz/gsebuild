@@ -3,7 +3,7 @@
 
 import type { TSESLint } from "@typescript-eslint/utils";
 
-// Taken from https://gitlab.gnome.org/ewlsh/gjs-guide/blob/main/src/guides/gjs/style-guide/eslint.config.js
+// Taken from https://gitlab.gnome.org/World/javascript/gjs-guide/-/blob/main/src/guides/gjs/style-guide/eslint.config.js
 export const config: TSESLint.FlatConfig.Config = {
   languageOptions: {
     globals: {
@@ -26,6 +26,12 @@ export const config: TSESLint.FlatConfig.Config = {
       setInterval: "readonly",
       clearTimeout: "readonly",
       clearInterval: "readonly",
+      // GNOME Shell Only
+      global: "readonly",
+      _: "readonly",
+      C_: "readonly",
+      N_: "readonly",
+      ngettext: "readonly",
     },
     parserOptions: {
       ecmaVersion: 2022,
