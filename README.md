@@ -87,3 +87,82 @@ To build blueprint you can then use a simple npm script with [glob](https://www.
   }
 }
 ```
+
+
+### Packging simple extensions
+
+`gsebuild` comes with a `gsebuild` utility which simplifies packing of extensions, configured through `package.json`.
+
+By default, `gsebuild` includes `extension.js`, `prefs.js`, and `metadata.json` in the current directory.
+Additional files and directories can be included via `package.json`:
+
+```json
+{
+  "scripts" {
+    "pack": "gsebuild pack"
+  },
+  "gsebuild": {
+    "pack": {
+      "extra-sources": ["LICENSE*", "README.md"]
+    }
+  }
+}
+```
+
+With this configuration `npm run pack` includes `extension.js`, `prefs.js`, `metadata.json`, the `README.md`, and all LICENSE files.
+The packed extension ZIP for upload to extensions.gnome.org gets written to the `dist/` directory.
+
+### Packaging complex extensions
+
+`gsebuild` also handles more complex extensions (see above for the Typescript setup):
+
+```json
+{
+  "scripts": {
+    "compile": "tsc --build tsconfig.json",
+    "postcompile": "eslint --no-config-lookup --config eslint.config.dist.js --quiet --fix .",
+    "predist": "npm run compile",
+    "dist": "gsebuild",
+  },
+  "gsebuild": {
+    "pack": {
+      "copy-to-source": [
+        "ui/*.ui",
+        ["./src/lib/vendor/saxes/README.md", "lib/vendor/saxes/README.md"],
+        ["./src/lib/vendor/xmlchars/README.md", "lib/vendor/xmlchars/README.md"]
+      ],
+      "source-directory": "build",
+      "extra-sources": [
+        "ui",
+        "lib",
+        "../README.md",
+        "../LICENSE*",
+        "../icons/",
+        "../metadata.json"
+      ],
+      "po-directory": "../po",
+      "schemas": [
+        "../schemas/*.gschema.xml"
+      ]
+    }
+  }
+}
+```
+
+This setup
+
+- compiles Typescript code to the `build` directory,
+- reformats the generated code to make it easier to read for the e.g.o reviewers, and
+- packs the extension:
+  - It works from the `build` directory,
+  - copies all `ui/*.ui` files and some extra READMEs to the build directory first, and then
+  - includes the `ui` and `lib` directories in `build`,
+  - as well as README, licenses, icons, and `metadata.json` (relative to `source-directory`),
+  - uses gettext message catalogs from the `../po` directory (relative to `source-directory`), and
+  - gsettings schemas in the `../schemas` directory (relative to `source-directory`).
+
+## Reference
+
+### gsebuild configuration
+
+TK
