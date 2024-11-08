@@ -5,3 +5,6 @@
 /package-lock.json
 
 /node_modules/
+
+# Leave my documents alone
+/README.md
