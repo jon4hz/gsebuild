@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import fs from "node:fs/promises";
+import path from "node:path";
 
 import { Command } from "@commander-js/extra-typings";
 
@@ -38,10 +39,10 @@ const program = (): Command => {
     .action(async () => {
       const config = (
         JSON.parse(
-          await fs.readFile("./package.json", { encoding: "utf-8" }),
+          await fs.readFile("./package.json", { encoding: "utf-8" })
         ) as PackageJson
       ).gsebuild;
-      await pack(config);
+      await pack(path.resolve(), config);
     });
 
   return program;

@@ -20,11 +20,12 @@ import { glob } from "glob";
 import { Ora, oraPromise } from "ora";
 
 import { Configuration, PatternToCopy } from "./config.js";
+import assert from "node:assert";
 
 type SourceAndDest = readonly [string, string];
 
 const getFilesToCopy = (
-  copyToSource: readonly Readonly<PatternToCopy>[],
+  copyToSource: readonly Readonly<PatternToCopy>[]
 ): Promise<readonly SourceAndDest[]> =>
   Promise.all(
     copyToSource.map(
@@ -34,14 +35,14 @@ const getFilesToCopy = (
         } else {
           return Promise.resolve([pattern]);
         }
-      },
-    ),
+      }
+    )
   ).then((files) =>
     files.flatMap((sources) =>
       sources.map((source) =>
-        typeof source === "string" ? [source, source] : source,
-      ),
-    ),
+        typeof source === "string" ? [source, source] : source
+      )
+    )
   );
 
 const copy =
@@ -61,13 +62,27 @@ const copy =
     spinner.text = `Copied ${filesToCopy.length.toFixed(0)} files to ${sourceDirectory}`;
   };
 
-const pack = async (config?: Configuration) => {
+const exists = async (directory: string): Promise<boolean> =>
+  fs.access(directory).then(
+    () => true,
+    () => false
+  );
+
+const pack = async (packageDirectory: string, config?: Configuration) => {
+  assert(
+    path.isAbsolute(packageDirectory),
+    "Absolute package directory required"
+  );
   const sourceDirectory = config?.pack?.["source-directory"] ?? ".";
   const targetDirectory = "dist";
   const extraSources = config?.pack?.["extra-sources"] ?? [];
-  const poDirectory = config?.pack?.["po-directory"];
+  const poDirectory =
+    config?.extension?.["po-directory"] ?? path.join(packageDirectory, "po");
   const schemas = config?.pack?.schemas ?? [];
   const copyToSource = config?.pack?.["copy-to-source"] ?? [];
+  const metadataJson =
+    config?.extension?.["metadata-file"] ??
+    path.join(packageDirectory, "metadata.json");
 
   if (0 < copyToSource.length) {
     await oraPromise(copy(sourceDirectory, copyToSource));
@@ -79,17 +94,18 @@ const pack = async (config?: Configuration) => {
     "--out-dir",
     targetDirectory,
     sourceDirectory,
+    `--extra-source=${metadataJson}`,
   ].concat(
     await Promise.all(
-      extraSources.map((source) => glob(source, { cwd: sourceDirectory })),
+      extraSources.map((source) => glob(source, { cwd: sourceDirectory }))
     ).then((sources) =>
-      sources.flat().map((source) => `--extra-source=${source}`),
+      sources.flat().map((source) => `--extra-source=${source}`)
     ),
     await Promise.all(
-      schemas.map((schema) => glob(schema, { cwd: sourceDirectory })),
-    ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`)),
+      schemas.map((schema) => glob(schema, { cwd: sourceDirectory }))
+    ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`))
   );
-  if (poDirectory) {
+  if (await exists(poDirectory)) {
     args.push(`--podir=${poDirectory}`);
   }
 
