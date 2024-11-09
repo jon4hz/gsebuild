@@ -27,11 +27,10 @@ export interface PackConfiguration {
    * It will automatically include the following files if they are found in the
    * source directory:
    *
-   * - `metadata.json`
    * - `extension.js`
    * - `prefs.js`.
    *
-   * Defaults to the current directory.
+   * Defaults to the directory containing `package.json`.
    */
   readonly "source-directory"?: string;
 
@@ -47,21 +46,6 @@ export interface PackConfiguration {
    * referenced by `po-directory` or `schemas`.
    */
   readonly "extra-sources"?: readonly string[];
-
-  /**
-   * The directory for gettext translation catalogs.
-   *
-   * A single directory relative to `source-directory`.
-   *
-   * If set the packging tool finds all gettext catalogs (`*.po`), compiles the
-   * into binary message catalogs using the text domain set in `metadata.json`,
-   * and includes these in the ZIP artifact so that they are available for the
-   * extension gettext API.
-   *
-   * See <https://gjs.guide/extensions/development/translations.html> for more
-   * information.
-   */
-  readonly "po-directory"?: string;
 
   /**
    * GSettings XML schemas to include.
@@ -81,9 +65,9 @@ export interface PackConfiguration {
   /**
    * Files to copy to `source-directory` before packing the extension.
    *
-   * A list of glob patterns (relative to the current directory) or pairs of
-   * source (relative to the current directory) and destination (relative to
-   * `source-directory`) path.
+   * A list of glob patterns (relative to the `package.json` directory) or pairs
+   * of source (relative to the `package.json` directory) and destination
+   * (relative to `source-directory`) path.
    *
    * For a glob pattern copy all matching files to the same place in the source
    * directory, i.e. preserve the directory hierarchy.
@@ -95,8 +79,43 @@ export interface PackConfiguration {
    * Use this if you compile Typescript to a separate output directory, and wish
    * to include additional data files along with the compiled modules which the
    * Typescript compiler would not pick up automatically.
+   *
+   * Note that copying a file to the `source-directory` does not imply that it
+   * is automatically included in the ZIP artifact.  Make sure that the copied
+   * file is directly or indirectly covered by `extra-sources`.
    */
   readonly "copy-to-source"?: readonly Readonly<PatternToCopy>[];
+}
+
+/**
+ * Overall configuration for this extension.
+ */
+export interface ExtensionConfiguration {
+  /**
+   * The path to the `metadata.json` file for this extension.
+   *
+   * Defaults to `metadata.json` in the directory of `package.json`.
+   *
+   * gsebuild reads extension metadata such as the UUID from this file, and
+   * automatically includes this file when packing the extension.
+   */
+  readonly "metadata-file"?: string;
+
+  /**
+   * The path to the directory containing gettext PO files for translating.
+   *
+   * A single directory relative to the directory containing `package.json`.
+   * Defaults to "po".
+   *
+   * The packging tool will process all gettext catalogs (`*.po`) in this
+   * directory, by compiling them using the text domain set in `metadata.json`,
+   * and includes them in the ZIP artifact so that they are available for the
+   * extension gettext API.
+   *
+   * See <https://gjs.guide/extensions/development/translations.html> for more
+   * information.
+   */
+  readonly "po-directory"?: string;
 }
 
 /**
@@ -106,7 +125,22 @@ export interface PackConfiguration {
  */
 export interface Configuration {
   /**
-   * Configuration for packing extensions into ZIP artifacts.
+   * Overall configuration for this extension.
+   */
+  readonly extension?: ExtensionConfiguration;
+
+  /**
+   * Configuration for packing this extension into a ZIP artifact.
+   *
+   * If unset pack according to the default configuration which only supports
+   * basic single-file extensions without settings or translations.
    */
   readonly pack?: PackConfiguration;
 }
+
+/**
+ * An expanded configuration without defaults.
+ */
+export type ExpandedConfiguration = Required<{
+  readonly [P in keyof Configuration]: Required<Configuration[P]>;
+}>;

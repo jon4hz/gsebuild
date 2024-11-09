@@ -19,7 +19,7 @@ import { execa } from "execa";
 import { glob } from "glob";
 import { Ora, oraPromise } from "ora";
 
-import { Configuration, PatternToCopy } from "./config.js";
+import { ExpandedConfiguration, PatternToCopy } from "./config.js";
 
 type SourceAndDest = readonly [string, string];
 
@@ -61,16 +61,19 @@ const copy =
     spinner.text = `Copied ${filesToCopy.length.toFixed(0)} files to ${sourceDirectory}`;
   };
 
-const pack = async (config?: Configuration) => {
-  const sourceDirectory = config?.pack?.["source-directory"] ?? ".";
-  const targetDirectory = "dist";
-  const extraSources = config?.pack?.["extra-sources"] ?? [];
-  const poDirectory = config?.pack?.["po-directory"];
-  const schemas = config?.pack?.schemas ?? [];
-  const copyToSource = config?.pack?.["copy-to-source"] ?? [];
+const exists = async (directory: string): Promise<boolean> =>
+  fs.access(directory).then(
+    () => true,
+    () => false,
+  );
 
-  if (0 < copyToSource.length) {
-    await oraPromise(copy(sourceDirectory, copyToSource));
+const pack = async (config: ExpandedConfiguration) => {
+  const targetDirectory = "dist";
+
+  if (0 < config.pack["copy-to-source"].length) {
+    await oraPromise(
+      copy(config.pack["source-directory"], config.pack["copy-to-source"]),
+    );
   }
 
   const args = [
@@ -78,19 +81,24 @@ const pack = async (config?: Configuration) => {
     "--force",
     "--out-dir",
     targetDirectory,
-    sourceDirectory,
+    config.pack["source-directory"],
+    `--extra-source=${config.extension["metadata-file"]}`,
   ].concat(
     await Promise.all(
-      extraSources.map((source) => glob(source, { cwd: sourceDirectory })),
+      config.pack["extra-sources"].map((source) =>
+        glob(source, { cwd: config.pack["source-directory"] }),
+      ),
     ).then((sources) =>
       sources.flat().map((source) => `--extra-source=${source}`),
     ),
     await Promise.all(
-      schemas.map((schema) => glob(schema, { cwd: sourceDirectory })),
+      config.pack.schemas.map((schema) =>
+        glob(schema, { cwd: config.pack["source-directory"] }),
+      ),
     ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`)),
   );
-  if (poDirectory) {
-    args.push(`--podir=${poDirectory}`);
+  if (await exists(config.extension["po-directory"])) {
+    args.push(`--podir=${config.extension["po-directory"]}`);
   }
 
   // Explicitly create the target directory upfront,
