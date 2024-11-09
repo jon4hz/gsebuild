@@ -142,10 +142,37 @@ To build blueprint you can then use a simple npm script with [glob](https://www.
 }
 ```
 
+### Translations
+
+`gsebuild` comes with a `gsebuild` utility which provides a `xgettext` command to extract translatable strings from the
+sources, configured through `package.json`.
+
+Configure gettext extraction in `package.json`:
+
+```json
+{
+  "gsebuild": {
+    "extension": {
+      "po-directory": "po"
+    }
+    "gettext": {
+      "sources": ["**/*.ts", "ui/*.blp"]
+    }
+  }
+}
+```
+
+Then run `gsebuild xgettext` to produce a gettext POT file with extracted strings at `po/$DOMAIN.pot` where `$DOMAIN`
+is the gettext domain of your extension, as configured in `metadata.json` (defaults to the extension UUID if unset).
+
+The `po-directory` defaults to `po` in the `package.json` directory.
+
+See <https://gjs.guide/extensions/development/translations.html> for more information about translating extensions.
+
 
 ### Packging simple extensions
 
-`gsebuild` comes with a `gsebuild` utility which simplifies packing of extensions, configured through `package.json`.
+`gsebuild` also provides a `pack` command which simplifies packing of extensions, configured through `package.json`.
 
 By default, `gsebuild` includes `extension.js`, `prefs.js`, and `metadata.json` in the current directory.
 Additional files and directories can be included via `package.json`:

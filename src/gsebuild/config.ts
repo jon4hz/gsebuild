@@ -19,6 +19,9 @@
  */
 export type PatternToCopy = string | [string, string];
 
+/**
+ * Configuration for packging an extension to a ZIP artifact.
+ */
 export interface PackConfiguration {
   /**
    * The source directory for packing.
@@ -88,6 +91,23 @@ export interface PackConfiguration {
 }
 
 /**
+ * Configuration for gettext and extension translations.
+ */
+export interface GettextConfiguration {
+  /**
+   * A list of glob patterns to extract messages from.
+   *
+   * Supports all languages supported by xgettext, and additionally Blueprint and Typescript.
+   */
+  readonly sources?: readonly string[];
+
+  /**
+   * The copyright holder for the package, to add to the POT header.
+   */
+  readonly "copyright-holder"?: string | null;
+}
+
+/**
  * Overall configuration for this extension.
  */
 export interface ExtensionConfiguration {
@@ -136,6 +156,11 @@ export interface Configuration {
    * basic single-file extensions without settings or translations.
    */
   readonly pack?: PackConfiguration;
+
+  /**
+   * Configuration for gettext message extraction and processing.
+   */
+  readonly gettext?: GettextConfiguration;
 }
 
 /**

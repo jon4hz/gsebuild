@@ -20,6 +20,7 @@ import { glob } from "glob";
 import { Ora, oraPromise } from "ora";
 
 import { ExpandedConfiguration, PatternToCopy } from "./config.js";
+import { MetadataJson } from "./metadata.js";
 
 type SourceAndDest = readonly [string, string];
 
@@ -67,7 +68,7 @@ const exists = async (directory: string): Promise<boolean> =>
     () => false,
   );
 
-const pack = async (config: ExpandedConfiguration) => {
+const pack = async (metadata: MetadataJson, config: ExpandedConfiguration) => {
   const targetDirectory = "dist";
 
   if (0 < config.pack["copy-to-source"].length) {
@@ -108,7 +109,7 @@ const pack = async (config: ExpandedConfiguration) => {
   await oraPromise(execa("gnome-extensions", args), {
     failText: `Failed to run gnome-extensions ${args.join(" ")}`,
     text: "Running gnome-extension pack",
-    successText: "Extension packed",
+    successText: `Extension packed at dist/${metadata.uuid}.shell-extension.zip`,
   });
 };
 

@@ -18,8 +18,10 @@ import path from "node:path";
 import { Command } from "@commander-js/extra-typings";
 
 import pack from "./pack.js";
+import xgettext from "./xgettext.js";
 import { Configuration, ExpandedConfiguration } from "./config.js";
 import pkg from "../../package.json" with { type: "json" };
+import { readMetadata } from "./metadata.js";
 
 interface PackageJson {
   readonly gsebuild?: Configuration;
@@ -58,6 +60,10 @@ const getConfiguration = async (): Promise<ExpandedConfiguration> => {
       "source-directory":
         config?.pack?.["source-directory"] ?? packageDirectory,
     },
+    gettext: {
+      sources: config?.gettext?.sources ?? [],
+      "copyright-holder": config?.gettext?.["copyright-holder"] ?? null,
+    },
   };
 };
 
@@ -73,9 +79,19 @@ const program = (): Command => {
     .command("pack")
     .description("Pack a GNOME shell extension")
     .action(async () => {
-      await pack(await getConfiguration());
+      const config = await getConfiguration();
+      const metadata = await readMetadata(config.extension["metadata-file"]);
+      await pack(metadata, config);
     });
 
+  program
+    .command("xgettext")
+    .description("Extract translatable strings for the extension")
+    .action(async () => {
+      const config = await getConfiguration();
+      const metadata = await readMetadata(config.extension["metadata-file"]);
+      await xgettext(metadata, config);
+    });
   return program;
 };
 
