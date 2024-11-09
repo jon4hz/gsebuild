@@ -137,3 +137,10 @@ export interface Configuration {
    */
   readonly pack?: PackConfiguration;
 }
+
+/**
+ * An expanded configuration without defaults.
+ */
+export type ExpandedConfiguration = Required<{
+  readonly [P in keyof Configuration]: Required<Configuration[P]>;
+}>;

@@ -19,13 +19,12 @@ import { execa } from "execa";
 import { glob } from "glob";
 import { Ora, oraPromise } from "ora";
 
-import { Configuration, PatternToCopy } from "./config.js";
-import assert from "node:assert";
+import { ExpandedConfiguration, PatternToCopy } from "./config.js";
 
 type SourceAndDest = readonly [string, string];
 
 const getFilesToCopy = (
-  copyToSource: readonly Readonly<PatternToCopy>[]
+  copyToSource: readonly Readonly<PatternToCopy>[],
 ): Promise<readonly SourceAndDest[]> =>
   Promise.all(
     copyToSource.map(
@@ -35,14 +34,14 @@ const getFilesToCopy = (
         } else {
           return Promise.resolve([pattern]);
         }
-      }
-    )
+      },
+    ),
   ).then((files) =>
     files.flatMap((sources) =>
       sources.map((source) =>
-        typeof source === "string" ? [source, source] : source
-      )
-    )
+        typeof source === "string" ? [source, source] : source,
+      ),
+    ),
   );
 
 const copy =
@@ -65,27 +64,16 @@ const copy =
 const exists = async (directory: string): Promise<boolean> =>
   fs.access(directory).then(
     () => true,
-    () => false
+    () => false,
   );
 
-const pack = async (packageDirectory: string, config?: Configuration) => {
-  assert(
-    path.isAbsolute(packageDirectory),
-    "Absolute package directory required"
-  );
-  const sourceDirectory = config?.pack?.["source-directory"] ?? ".";
+const pack = async (config: ExpandedConfiguration) => {
   const targetDirectory = "dist";
-  const extraSources = config?.pack?.["extra-sources"] ?? [];
-  const poDirectory =
-    config?.extension?.["po-directory"] ?? path.join(packageDirectory, "po");
-  const schemas = config?.pack?.schemas ?? [];
-  const copyToSource = config?.pack?.["copy-to-source"] ?? [];
-  const metadataJson =
-    config?.extension?.["metadata-file"] ??
-    path.join(packageDirectory, "metadata.json");
 
-  if (0 < copyToSource.length) {
-    await oraPromise(copy(sourceDirectory, copyToSource));
+  if (0 < config.pack["copy-to-source"].length) {
+    await oraPromise(
+      copy(config.pack["source-directory"], config.pack["copy-to-source"]),
+    );
   }
 
   const args = [
@@ -93,20 +81,24 @@ const pack = async (packageDirectory: string, config?: Configuration) => {
     "--force",
     "--out-dir",
     targetDirectory,
-    sourceDirectory,
-    `--extra-source=${metadataJson}`,
+    config.pack["source-directory"],
+    `--extra-source=${config.extension["metadata-file"]}`,
   ].concat(
     await Promise.all(
-      extraSources.map((source) => glob(source, { cwd: sourceDirectory }))
+      config.pack["extra-sources"].map((source) =>
+        glob(source, { cwd: config.pack["source-directory"] }),
+      ),
     ).then((sources) =>
-      sources.flat().map((source) => `--extra-source=${source}`)
+      sources.flat().map((source) => `--extra-source=${source}`),
     ),
     await Promise.all(
-      schemas.map((schema) => glob(schema, { cwd: sourceDirectory }))
-    ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`))
+      config.pack.schemas.map((schema) =>
+        glob(schema, { cwd: config.pack["source-directory"] }),
+      ),
+    ).then((schemas) => schemas.flat().map((schema) => `--schema=${schema}`)),
   );
-  if (await exists(poDirectory)) {
-    args.push(`--podir=${poDirectory}`);
+  if (await exists(config.extension["po-directory"])) {
+    args.push(`--podir=${config.extension["po-directory"]}`);
   }
 
   // Explicitly create the target directory upfront,

@@ -18,12 +18,40 @@ import path from "node:path";
 import { Command } from "@commander-js/extra-typings";
 
 import pack from "./pack.js";
-import { Configuration } from "./config.js";
+import { Configuration, ExpandedConfiguration } from "./config.js";
 import pkg from "../../package.json" with { type: "json" };
 
 interface PackageJson {
   readonly gsebuild?: Configuration;
 }
+
+const getConfiguration = async (): Promise<ExpandedConfiguration> => {
+  const packageDirectory = path.resolve();
+  const config = (
+    JSON.parse(
+      await fs.readFile(path.join(packageDirectory, "package.json"), {
+        encoding: "utf-8",
+      }),
+    ) as PackageJson
+  ).gsebuild;
+  return {
+    extension: {
+      "metadata-file":
+        config?.extension?.["metadata-file"] ??
+        path.join(packageDirectory, "metadata.json"),
+      "po-directory":
+        config?.extension?.["po-directory"] ??
+        path.join(packageDirectory, "po"),
+    },
+    pack: {
+      "copy-to-source": config?.pack?.["copy-to-source"] ?? [],
+      "extra-sources": config?.pack?.["extra-sources"] ?? [],
+      schemas: config?.pack?.schemas ?? [],
+      "source-directory":
+        config?.pack?.["source-directory"] ?? packageDirectory,
+    },
+  };
+};
 
 const program = (): Command => {
   const program = new Command();
@@ -37,12 +65,7 @@ const program = (): Command => {
     .command("pack")
     .description("Pack a GNOME shell extension")
     .action(async () => {
-      const config = (
-        JSON.parse(
-          await fs.readFile("./package.json", { encoding: "utf-8" })
-        ) as PackageJson
-      ).gsebuild;
-      await pack(path.resolve(), config);
+      await pack(await getConfiguration());
     });
 
   return program;
