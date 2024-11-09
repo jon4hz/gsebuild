@@ -25,13 +25,21 @@ interface PackageJson {
   readonly gsebuild?: Configuration;
 }
 
+/**
+ * Get the expanded configuration.
+ *
+ * Load configuration from `package.json` and expand missing values to their
+ * defaults.
+ *
+ * @returns The configuration from `package.json`
+ */
 const getConfiguration = async (): Promise<ExpandedConfiguration> => {
   const packageDirectory = path.resolve();
   const config = (
     JSON.parse(
       await fs.readFile(path.join(packageDirectory, "package.json"), {
         encoding: "utf-8",
-      }),
+      })
     ) as PackageJson
   ).gsebuild;
   return {
