@@ -221,4 +221,4 @@ This setup
 
 ### gsebuild configuration
 
-TK
+See API documentation of the `Configuration` interface.
