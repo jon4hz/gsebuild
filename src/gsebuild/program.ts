@@ -12,60 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import fs from "node:fs/promises";
-import path from "node:path";
-
 import { Command } from "@commander-js/extra-typings";
 
 import pack from "./pack.js";
 import xgettext from "./xgettext.js";
-import { Configuration, ExpandedConfiguration } from "./config.js";
 import pkg from "../../package.json" with { type: "json" };
-import { readMetadata } from "./metadata.js";
-
-interface PackageJson {
-  readonly gsebuild?: Configuration;
-}
-
-/**
- * Get the expanded configuration.
- *
- * Load configuration from `package.json` and expand missing values to their
- * defaults.
- *
- * @returns The configuration from `package.json`
- */
-const getConfiguration = async (): Promise<ExpandedConfiguration> => {
-  const packageDirectory = path.resolve();
-  const config = (
-    JSON.parse(
-      await fs.readFile(path.join(packageDirectory, "package.json"), {
-        encoding: "utf-8",
-      }),
-    ) as PackageJson
-  ).gsebuild;
-  return {
-    extension: {
-      "metadata-file":
-        config?.extension?.["metadata-file"] ??
-        path.join(packageDirectory, "metadata.json"),
-      "po-directory":
-        config?.extension?.["po-directory"] ??
-        path.join(packageDirectory, "po"),
-    },
-    pack: {
-      "copy-to-source": config?.pack?.["copy-to-source"] ?? [],
-      "extra-sources": config?.pack?.["extra-sources"] ?? [],
-      schemas: config?.pack?.schemas ?? [],
-      "source-directory":
-        config?.pack?.["source-directory"] ?? packageDirectory,
-    },
-    gettext: {
-      sources: config?.gettext?.sources ?? [],
-      "copyright-holder": config?.gettext?.["copyright-holder"] ?? null,
-    },
-  };
-};
 
 const program = (): Command => {
   const program = new Command();
@@ -79,18 +30,14 @@ const program = (): Command => {
     .command("pack")
     .description("Pack a GNOME shell extension")
     .action(async () => {
-      const config = await getConfiguration();
-      const metadata = await readMetadata(config.extension["metadata-file"]);
-      await pack(metadata, config);
+      await pack();
     });
 
   program
     .command("xgettext")
     .description("Extract translatable strings for the extension")
     .action(async () => {
-      const config = await getConfiguration();
-      const metadata = await readMetadata(config.extension["metadata-file"]);
-      await xgettext(metadata, config);
+      await xgettext();
     });
   return program;
 };
