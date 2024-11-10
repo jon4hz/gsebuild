@@ -39,7 +39,7 @@ const getConfiguration = async (): Promise<ExpandedConfiguration> => {
     JSON.parse(
       await fs.readFile(path.join(packageDirectory, "package.json"), {
         encoding: "utf-8",
-      })
+      }),
     ) as PackageJson
   ).gsebuild;
   return {
