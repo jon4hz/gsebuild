@@ -164,6 +164,7 @@ Additional files and directories can be included via `package.json`:
 ```
 
 With this configuration `npm run pack` includes `extension.js`, `prefs.js`, `metadata.json`, the `README.md`, and all LICENSE files.
+It also includes all gettext catalogs in the `po` directory and compiles them, to support extension translations (see above).
 The packed extension ZIP for upload to extensions.gnome.org gets written to the `dist/` directory.
 
 Note that `gsebuild pack` uses the `gnome-extensions pack` command under the hood, and thus requires `gnome-shell` to be installed.
@@ -194,9 +195,7 @@ Note that `gsebuild pack` uses the `gnome-extensions pack` command under the hoo
         "../README.md",
         "../LICENSE*",
         "../icons/",
-        "../metadata.json"
       ],
-      "po-directory": "../po",
       "schemas": [
         "../schemas/*.gschema.xml"
       ]
@@ -213,8 +212,8 @@ This setup
   - It works from the `build` directory,
   - copies all `ui/*.ui` files and some extra READMEs to the build directory first, and then
   - includes the `ui` and `lib` directories in `build`,
-  - as well as README, licenses, icons, and `metadata.json` (relative to `source-directory`),
-  - uses gettext message catalogs from the `../po` directory (relative to `source-directory`), and
+  - as well as README, licenses, and icons (relative to `source-directory`),
+  - uses gettext message catalogs from the `po` directory beneath `package.json` if it exists, and
   - gsettings schemas in the `../schemas` directory (relative to `source-directory`).
 
 ## Reference
