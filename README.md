@@ -12,11 +12,8 @@ with Typescript:
 - Provide recommended eslint and tsc configurations.
 - Provide a `gsebuild` tool with helpful commands for managing extensions:
   - `gsebuild pack` packs an extension ZIP for submission to extensions.gnome.org.
-
-Planned features:
-
-- Extract messages from sources and UI/BLP files with xgettext.
-- Submit to extensions.gnome.org
+  - `gsebuild xgettext` extracts messages from sources and UI/BLP files with xgettext.
+  - `gsebuild upload` submits extension artifacts to extensions.gnome.org
 
 ## Installation
 
