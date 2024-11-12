@@ -18,13 +18,12 @@ import path from "node:path";
 import { glob } from "glob";
 import { execa } from "execa";
 
-import { ExpandedConfiguration } from "./config.js";
-import { MetadataJson } from "./metadata.js";
+import { getConfiguration } from "./config.js";
+import { readMetadata } from "./metadata.js";
 
-const xgettext = async (
-  metadata: MetadataJson,
-  config: ExpandedConfiguration,
-) => {
+const xgettext = async () => {
+  const config = await getConfiguration();
+  const metadata = await readMetadata(config.extension["metadata-file"]);
   if (config.gettext.sources.length === 0) {
     throw new Error("No sources configured for xgettext!");
   }

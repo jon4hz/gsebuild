@@ -19,8 +19,8 @@ import { execa } from "execa";
 import { glob } from "glob";
 import { Ora, oraPromise } from "ora";
 
-import { ExpandedConfiguration, PatternToCopy } from "./config.js";
-import { MetadataJson } from "./metadata.js";
+import { getConfiguration, PatternToCopy } from "./config.js";
+import { readMetadata } from "./metadata.js";
 
 type SourceAndDest = readonly [string, string];
 
@@ -68,7 +68,8 @@ const exists = async (directory: string): Promise<boolean> =>
     () => false,
   );
 
-const pack = async (metadata: MetadataJson, config: ExpandedConfiguration) => {
+const pack = async () => {
+  const config = await getConfiguration();
   const targetDirectory = "dist";
 
   if (0 < config.pack["copy-to-source"].length) {
@@ -101,6 +102,8 @@ const pack = async (metadata: MetadataJson, config: ExpandedConfiguration) => {
   if (await exists(config.extension["po-directory"])) {
     args.push(`--podir=${config.extension["po-directory"]}`);
   }
+
+  const metadata = await readMetadata(config.extension["metadata-file"]);
 
   // Explicitly create the target directory upfront,
   // otherwise gnome-extensions pack segfaults, see
