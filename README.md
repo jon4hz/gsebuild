@@ -243,6 +243,10 @@ This setup
   - uses gettext message catalogs from the `po` directory beneath `package.json` if it exists, and
   - gsettings schemas in the `../schemas` directory (relative to `source-directory`).
 
+### Uploading extensions
+
+`gsebuild upload` can upload packed extensions directly from the command line.
+
 ## Reference
 
 ### gsebuild configuration
