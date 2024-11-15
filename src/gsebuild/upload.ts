@@ -15,11 +15,11 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 
-import * as prompts from "@inquirer/prompts";
 import { Command, OptionValues } from "@commander-js/extra-typings";
 
 import { ExpandedConfiguration, getConfiguration } from "./config.js";
 import { readMetadata } from "./metadata.js";
+import * as prompts from "./prompts.js";
 import * as ego from "./ego-api.js";
 
 export interface UploadOptions extends Record<string, unknown> {
