@@ -15,7 +15,7 @@
 import path from "node:path";
 import fs from "node:fs/promises";
 
-import { Command, OptionValues } from "@commander-js/extra-typings";
+import { Command } from "@commander-js/extra-typings";
 
 import { ExpandedConfiguration, getConfiguration } from "./config.js";
 import { readMetadata } from "./metadata.js";
@@ -55,14 +55,14 @@ const promptForMissingConfirmations = async (
     })),
 });
 
-const checkConfirmations = (
-  program: Command<unknown[], OptionValues>,
-  confirmations: ego.Confirmations,
-) => {
+class ConfirmationMissingError extends Error {
+  override name = "UnconfirmedError";
+}
+
+const checkConfirmations = (confirmations: ego.Confirmations) => {
   if (!(confirmations.shell_license_compliant && confirmations.tos_compliant)) {
-    program.error(
+    throw new ConfirmationMissingError(
       "You must accept the license and terms of service for extensions.gnome.org",
-      { exitCode: 1 },
     );
   }
 };
@@ -129,6 +129,67 @@ const getConfirmations = async (
   }
 };
 
+export const withToken = async <T>(
+  auth: ego.UserAuthentication,
+  f: (token: string) => Promise<T>,
+): Promise<T> => {
+  const token = await ego.login(auth);
+
+  let maybeValidToken: string | null = token;
+  process.once("beforeExit", () => {
+    // Make sure we cleanup the token if nodejs exits in any way.  We need to do
+    // this in a beforeExit because we need to account for inquirer prompts
+    // being auto-exited as a result from Ctrl+C or stdin being closed.  In this
+    // case inquirer reacts on the node exit signal, meaning node is already
+    // shutting down, which limits our ability to run more promises from regular
+    // code. Instead we hook into beforeExit which is our only ability for async
+    // code at this point.
+    if (maybeValidToken !== null) {
+      void ego.logout(maybeValidToken);
+    }
+  });
+  try {
+    return await f(token);
+  } finally {
+    await ego.logout(token);
+    maybeValidToken = null;
+  }
+};
+
+class UploadCancelledError extends Error {
+  override name = "UploadCancelledError";
+}
+
+const uploadArtifact = async (
+  token: string,
+  options: UploadOptions,
+  artifactFile: string,
+  contents: Buffer,
+): Promise<string> => {
+  const confirmations = await getConfirmations(options);
+  checkConfirmations(confirmations);
+
+  const mayUpload =
+    // If we are asked not to ask don't ask ^^
+    !options.interaction ||
+    (await prompts.confirm({ message: `Upload ${artifactFile}?` }));
+  if (!mayUpload) {
+    throw new UploadCancelledError("Upload cancelled");
+  }
+  const { version, extension: uuid } = await ego.upload(
+    token,
+    confirmations,
+    path.basename(artifactFile),
+    contents,
+  );
+  const { id } = await ego.queryExtension(token, uuid);
+  const extensionUrl = `https://extensions.gnome.org/extension/${id.toFixed(0)}/`;
+  console.log(
+    `Successfully uploaded extension ${uuid} version ${version.toFixed(0)} to ${extensionUrl}`,
+  );
+  return extensionUrl;
+};
+
 export const upload = async (
   extensionZip: string | undefined,
   options: UploadOptions,
@@ -154,33 +215,23 @@ export const upload = async (
     process.env["EGO_PASSWORD"] ??
     (options.interaction
       ? await prompts.password({ message: "Your e.g.o password" })
-      : program.error("Missing passwrd; set $EGO_PASSWORD", { exitCode: 2 }));
+      : program.error("Missing password; set $EGO_PASSWORD", { exitCode: 2 }));
 
-  const token = await ego.login({ username, password });
   try {
-    const confirmations = await getConfirmations(options);
-    checkConfirmations(program, confirmations);
-
-    const mayUpload =
-      // If we are asked not to ask don't ask ^^
-      !options.interaction ||
-      (await prompts.confirm({ message: `Upload ${artifactFile}?` }));
-    if (!mayUpload) {
-      program.error("Upload cancelled", { exitCode: 2 });
+    await withToken({ username, password }, async (token) => {
+      return await uploadArtifact(token, options, artifactFile, artifact);
+    });
+  } catch (error) {
+    if (
+      error instanceof UploadCancelledError ||
+      error instanceof ConfirmationMissingError
+    ) {
+      program.error(error.message, { exitCode: 2 });
+    } else if (error instanceof Error && error.name === "ExitPromptError") {
+      // Enforce an exit code for prompts dismissed as result of Ctrl+C or stdin
+      // being closed.
+      program.error(error.message, { exitCode: 255 });
     }
-    const { version, extension: uuid } = await ego.upload(
-      token,
-      confirmations,
-      path.basename(artifactFile),
-      artifact,
-    );
-    const { id } = await ego.queryExtension(token, uuid);
-    const extensionUrl = `https://extensions.gnome.org/extension/${id.toFixed(0)}/`;
-    console.log(
-      `Successfully uploaded extension ${uuid} version ${version.toFixed(0)} to ${extensionUrl}`,
-    );
-  } finally {
-    await ego.logout(token);
   }
 };
 
