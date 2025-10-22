@@ -1,13 +1,13 @@
 {
-  "name": "@swsnr/gsebuild",
+  "name": "@jon4hz/gsebuild",
   "version": "0.1.2",
   "description": "Build tooling for Gnome shell extensions",
   "type": "module",
-  "homepage": "https://github.com/swsnr/gsebuild#readme",
+  "homepage": "https://github.com/jon4hz/gsebuild#readme",
   "bugs": {
-    "url": "https://github.com/swsnr/gsebuild/issues"
+    "url": "https://github.com/jon4hz/gsebuild/issues"
   },
-  "repository": "swsnr/gsebuild",
+  "repository": "jon4hz/gsebuild",
   "keywords": [
     "gnome",
     "shell",
@@ -17,7 +17,7 @@
   "engines": {
     "node": ">=23"
   },
-  "author": "Sebastian Wiesner <sebastian@swsnr.de>",
+  "author": "Jonah Zürcher <me@jon4hz.io>",
   "license": "Apache-2.0",
   "dependencies": {
     "@commander-js/extra-typings": "^12.1.0",

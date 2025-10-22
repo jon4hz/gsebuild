@@ -1,8 +1,8 @@
 # gsebuild
 
-![NPM Version](https://img.shields.io/npm/v/%40swsnr%2Fgsebuild)
-![CI status](https://img.shields.io/github/actions/workflow/status/swsnr/gsebuild/ci.yaml)
-![Apache 2.0 license](https://img.shields.io/github/license/swsnr/gsebuild)
+![NPM Version](https://img.shields.io/npm/v/%40jon4hz%2Fgsebuild)
+![CI status](https://img.shields.io/github/actions/workflow/status/jon4hz/gsebuild/ci.yaml)
+![Apache 2.0 license](https://img.shields.io/github/license/jon4hz/gsebuild)
 
 Some kind of a build tool for GNOME extensions.
 
@@ -18,7 +18,7 @@ with Typescript:
 ## Installation
 
 ```console
-$ npm install --save-dev @swsnr/gsebuild
+$ npm install --save-dev @jon4hz/gsebuild
 ```
 
 ## Setup
@@ -29,7 +29,7 @@ $ npm install --save-dev @swsnr/gsebuild
 Setup `eslint.config.js` as follows:
 
 ```javascript
-import gsebuild from "@swsnr/gsebuild/eslint";
+import gsebuild from "@jon4hz/gsebuild/eslint";
 
 export default [
   ...gsebuild.configs.javascript,
@@ -54,7 +54,7 @@ Then create a `tsconfig.json`:
 
 ```json
 {
-  "extends": "@swsnr/gsebuild/tsconfig.json",
+  "extends": "@jon4hz/gsebuild/tsconfig.json",
   "compilerOptions": {
     "outDir": "build"
   },
@@ -66,7 +66,7 @@ And a eslint configuration file `eslint.config.dist.js` to reformat typescript
 for submission to extensions.gnome.org:
 
 ```javascript
-import eslint from "@swsnr/gsebuild/eslint";
+import eslint from "@jon4hz/gsebuild/eslint";
 
 export default [
   eslint.config.dist,
@@ -91,7 +91,7 @@ For linting with `eslint`, use the recommended typescript configuration from
 `gsebuild` in `eslint.confg.js`, and set up [typed linting](https://typescript-eslint.io/getting-started/typed-linting):
 
 ```javascript
-import gsebuild from "@swsnr/gsebuild/eslint";
+import gsebuild from "@jon4hz/gsebuild/eslint";
 
 export default [
   ...gsebuild.configs.typescript,

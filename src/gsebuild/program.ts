@@ -29,7 +29,7 @@ const program = (): Command => {
     .addHelpText(
       "after",
       `
-Homepage: https://github.com/swsnr/gsebuild
+Homepage: https://github.com/jon4hz/gsebuild
 
 Licensed under the Apache License, Version 2.0 (the "License");
 See http://www.apache.org/licenses/LICENSE-2.0
