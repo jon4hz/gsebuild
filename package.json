@@ -23,7 +23,7 @@
     "@commander-js/extra-typings": "^12.1.0",
     "@eslint/js": "^9.14.0",
     "@inquirer/confirm": "^5.0.2",
-    "@inquirer/input": "^4.0.2",
+    "@inquirer/input": "^5.0.8",
     "@inquirer/password": "^4.0.2",
     "@tsconfig/strictest": "^2.0.5",
     "@types/eslint__js": "^8.42.3",
